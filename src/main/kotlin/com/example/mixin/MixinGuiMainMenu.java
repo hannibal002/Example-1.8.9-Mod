@@ -11,6 +11,6 @@ public class MixinGuiMainMenu {
 
     @Inject(method = "initGui", at = @At("HEAD"))
     public void onInitGui(CallbackInfo ci) {
-//        System.out.println("Hello from Main Menu!");
+        System.out.println("Hello from Main Menu!");
     }
 }
