@@ -3,6 +3,9 @@ package com.example.config
 import com.example.config.categories.ExampleModConfig
 import com.example.errors.ConfigError
 import com.google.gson.GsonBuilder
+import com.google.gson.TypeAdapter
+import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonWriter
 import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
 import io.github.moulberry.moulconfig.gui.MoulConfigEditor
 import io.github.moulberry.moulconfig.observer.PropertyTypeAdapterFactory
@@ -17,6 +20,7 @@ import java.io.*
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
+import java.util.*
 
 class ConfigManager {
     companion object {
@@ -24,6 +28,15 @@ class ConfigManager {
             .excludeFieldsWithoutExposeAnnotation()
             .serializeSpecialFloatingPointValues()
             .registerTypeAdapterFactory(PropertyTypeAdapterFactory())
+            .registerTypeAdapter(UUID::class.java, object : TypeAdapter<UUID>() {
+                override fun write(out: JsonWriter, value: UUID) {
+                    out.value(value.toString())
+                }
+
+                override fun read(reader: JsonReader): UUID {
+                    return UUID.fromString(reader.nextString())
+                }
+            }.nullSafe())
             .enableComplexMapKeySerialization()
             .create()
     }
