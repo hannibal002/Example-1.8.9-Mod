@@ -3,9 +3,6 @@ package com.example.config
 import com.example.config.categories.ExampleModConfig
 import com.example.errors.ConfigError
 import com.google.gson.GsonBuilder
-import com.google.gson.TypeAdapter
-import com.google.gson.stream.JsonReader
-import com.google.gson.stream.JsonWriter
 import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
 import io.github.moulberry.moulconfig.gui.MoulConfigEditor
 import io.github.moulberry.moulconfig.observer.PropertyTypeAdapterFactory
@@ -16,18 +13,10 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
-import java.io.BufferedReader
-import java.io.BufferedWriter
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
-import java.io.IOException
-import java.io.InputStreamReader
-import java.io.OutputStreamWriter
+import java.io.*
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
-import java.util.UUID
 
 class ConfigManager {
     companion object {
@@ -35,20 +24,11 @@ class ConfigManager {
             .excludeFieldsWithoutExposeAnnotation()
             .serializeSpecialFloatingPointValues()
             .registerTypeAdapterFactory(PropertyTypeAdapterFactory())
-            .registerTypeAdapter(UUID::class.java, object : TypeAdapter<UUID>() {
-                override fun write(out: JsonWriter, value: UUID) {
-                    out.value(value.toString())
-                }
-
-                override fun read(reader: JsonReader): UUID {
-                    return UUID.fromString(reader.nextString())
-                }
-            }.nullSafe())
             .enableComplexMapKeySerialization()
             .create()
     }
 
-    private var configDirectory = File("config/skyhanni")
+    private var configDirectory = File("config/examplemod")
     private var configFile: File
     var config: ExampleModConfig? = null
     private var lastSaveTime = 0L
@@ -114,7 +94,6 @@ class ConfigManager {
             val unit = configDirectory.resolve("config.json.write")
             unit.createNewFile()
             BufferedWriter(OutputStreamWriter(FileOutputStream(unit), StandardCharsets.UTF_8)).use { writer ->
-                // TODO remove old "hidden" area
                 writer.write(gson.toJson(config))
             }
             // Perform move — which is atomic, unlike writing — after writing is done.
